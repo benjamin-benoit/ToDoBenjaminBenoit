@@ -5,12 +5,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.benben.todo.R
+import com.benben.todo.network.Api
 import com.benben.todo.task.TaskActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.fragment_task_list.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.io.Serializable
 import java.util.*
 
@@ -22,6 +27,10 @@ class TaskListFragment : Fragment() {
         Task(id = "id_2", title = "Task 2"),
         Task(id = "id_3", title = "Task 3")
     )
+
+
+    // Création:
+    private val coroutineScope = MainScope()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +46,10 @@ class TaskListFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(activity)
         val fab = view.findViewById<FloatingActionButton>(R.id.fabAdd)
+
+        val textViewUser = view.findViewById<TextView>(R.id.textViewUser)
+
+        //textViewUser.text = "${userInfo.firstName} ${userInfo.lastName}"
         savedInstanceState?.getParcelableArrayList<Task>("taskList")?.let { savedList ->
             taskList.clear()
             taskList.addAll(savedList)
@@ -74,6 +87,21 @@ class TaskListFragment : Fragment() {
             //taskList.set(taskList.indexOfFirst {it.id == task.id}, task)
             recyclerView.adapter?.notifyDataSetChanged()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Utilisation:
+        coroutineScope.launch {
+            val userInfo = Api.userService.getInfo().body()!!
+            textViewUser.text = "${userInfo.firstName} ${userInfo.lastName}"}
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Suppression dans onDestroy():
+        coroutineScope.cancel()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

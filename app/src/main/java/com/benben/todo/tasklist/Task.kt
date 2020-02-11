@@ -1,7 +1,14 @@
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
-import java.io.Serializable
+import com.squareup.moshi.Json
 
-@Parcelize
-data class Task(var id: String, var title: String, var description: String = "no description."): Serializable, Parcelable {}
+data class Task(
+    @field:Json(name = "id")
+    val id: String,
+    @field:Json(name = "title")
+    val title: String,
+    @field:Json(name = "description")
+    val description: String = "no description."
+)
+
+//@Parcelize
+//data class Task(var id: String, var title: String, var description: String = "no description."): Serializable, Parcelable {}
