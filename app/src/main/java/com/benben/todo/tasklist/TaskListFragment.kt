@@ -16,8 +16,6 @@ import com.benben.todo.task.TaskActivity
 import com.benben.todo.task.TasksRepository
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.fragment_task_list.*
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.io.Serializable
 import java.util.*
@@ -31,10 +29,11 @@ class TaskListFragment : Fragment() {
         Task(id = "id_3", title = "Task 3")
     )
 
-    private val tasksRepository: TasksRepository = TasksRepository()
+    private val tasksRepository= TasksRepository()
+    private val tasks = mutableListOf<Task>()
 
     // Création:
-    private val coroutineScope = MainScope()
+//    private val coroutineScope = MainScope()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -80,8 +79,11 @@ class TaskListFragment : Fragment() {
             recyclerView.adapter?.notifyDataSetChanged()
         }
         adapter.onDeleteClickListener = { task ->
-            taskList.remove(task)
-            recyclerView.adapter?.notifyDataSetChanged()
+//            taskList.remove(task)
+//            recyclerView.adapter?.notifyDataSetChanged()
+            lifecycleScope.launch {
+                tasksRepository.deleteTask(task)
+            }
         }
     }
 
@@ -89,19 +91,17 @@ class TaskListFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == ADD_TASK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val task = data!!.getSerializableExtra("task") as Task
-            taskList.add(task)
+//            taskList.add(task)
+            lifecycleScope.launch {
+                tasksRepository.createTask(task)
+            }
             recyclerView.adapter?.notifyDataSetChanged()
         } else if (requestCode == EDIT_TASK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val task = data!!.getSerializableExtra("task") as Task
-            val index = taskList.indexOfFirst { it.id == task.id }
-            taskList[index] = task
+//            val index = taskList.indexOfFirst { it.id == task.id }
+//            taskList[index] = task
             lifecycleScope.launch {
-                tasksRepository.updateTask(task)?.let { task ->
-                    val editableList = _tasksListLiveData.value.orEmpty().toMutableList()
-                    val position = editableList.indexOfFirst { task.id == it.id }
-                    editableList[position] = task
-                    _tasksListLiveData.value = editableList
-                }
+                tasksRepository.updateTask(task)
             }
             //taskList.set(taskList.indexOfFirst {it.id == task.id}, task)
             recyclerView.adapter?.notifyDataSetChanged()
@@ -111,21 +111,13 @@ class TaskListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // Utilisation:
-        coroutineScope.launch {
+        lifecycleScope.launch {
             val userInfo = Api.userService.getInfo().body()!!
             textViewUser.text = "${userInfo.firstName} ${userInfo.lastName}"
-        }
-        // Dans onResume()
-        lifecycleScope.launch {
             tasksRepository.refresh()
         }
 
-    }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        // Suppression dans onDestroy():
-        coroutineScope.cancel()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -138,3 +130,4 @@ class TaskListFragment : Fragment() {
         const val EDIT_TASK_REQUEST_CODE = 888
     }
 }
+
