@@ -95,6 +95,14 @@ class TaskListFragment : Fragment() {
             val task = data!!.getSerializableExtra("task") as Task
             val index = taskList.indexOfFirst { it.id == task.id }
             taskList[index] = task
+            lifecycleScope.launch {
+                tasksRepository.updateTask(task)?.let { task ->
+                    val editableList = _tasksListLiveData.value.orEmpty().toMutableList()
+                    val position = editableList.indexOfFirst { task.id == it.id }
+                    editableList[position] = task
+                    _tasksListLiveData.value = editableList
+                }
+            }
             //taskList.set(taskList.indexOfFirst {it.id == task.id}, task)
             recyclerView.adapter?.notifyDataSetChanged()
         }
@@ -111,6 +119,7 @@ class TaskListFragment : Fragment() {
         lifecycleScope.launch {
             tasksRepository.refresh()
         }
+
     }
 
     override fun onDestroy() {
