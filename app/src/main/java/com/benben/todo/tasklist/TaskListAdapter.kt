@@ -5,13 +5,17 @@ import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
 import com.benben.todo.R
 import kotlinx.android.synthetic.main.item_task.view.*
+import kotlin.properties.Delegates
 
-class TaskListAdapter(public var taskList: List<Task> = emptyList()) :
-    RecyclerView.Adapter<TaskListAdapter.TaskViewHolder>() {
+class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskViewHolder>() {
 
     // Déclaration d'une lambda comme variable:
     var onEditClickListener: ((Task) -> Unit)? = null
     var onDeleteClickListener: ((Task) -> Unit)? = null
+
+    var taskList: List<Task> by Delegates.observable(emptyList()) { _, _, _ ->
+        notifyDataSetChanged()
+    }
 
     inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(task: Task) {
