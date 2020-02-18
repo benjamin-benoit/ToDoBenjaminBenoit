@@ -9,14 +9,17 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.benben.todo.R
+import com.benben.todo.network.Api
 import com.benben.todo.task.TaskActivity
 import com.benben.todo.tasklist.TaskListViewModel
 import com.benben.todo.userinfo.UserInfoActivity
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.fragment_task_list.*
+import kotlinx.coroutines.launch
 import java.io.Serializable
 import java.util.*
 
@@ -44,6 +47,10 @@ class TaskListFragment : Fragment() {
 //        val image_viewiew = view.findViewById<ImageView>(R.id.image_view)
 
         val textViewUser = view.findViewById<TextView>(R.id.textViewUser)
+        lifecycleScope.launch {
+            val userInfo = Api.userService.getInfo().body()!!
+            textViewUser.text = "${userInfo.firstName} ${userInfo.lastName}"
+        }
 
         viewModel.taskList.observe(this, Observer { newList ->
             adapter.taskList = newList.orEmpty()
@@ -89,7 +96,11 @@ class TaskListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Glide.with(this).load("https://goo.gl/gEgYUd").into(imageView)
+        val glide = Glide.with(this)
+        lifecycleScope.launch {
+            val userInfo = Api.userService.getInfo().body()!!
+            glide.load(userInfo.avatar).into(imageView)
+        }
         viewModel.loadTasks()
     }
 
