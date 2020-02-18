@@ -30,12 +30,12 @@ import java.io.IOException
 class UserInfoActivity: AppCompatActivity() {
 
     private val userWebService = Api.userService
-    val takePictureButton = findViewById<Button>(R.id.take_picture_button)
-    val uploadImageButton = findViewById<Button>(R.id.upload_image_button)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_info)
+        val takePictureButton = findViewById<Button>(R.id.take_picture_button)
+        val uploadImageButton = findViewById<Button>(R.id.upload_image_button)
+
         takePictureButton.setOnClickListener{
             askCameraPermissionAndOpenCamera()
         }
