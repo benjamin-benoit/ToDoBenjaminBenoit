@@ -48,12 +48,10 @@ class TaskListFragment : Fragment() {
         })
 
         savedInstanceState?.getParcelableArrayList<Task>("taskList")?.let { savedList ->
-            viewModel.taskList.observe(this, Observer { task ->
-                adapter.taskList = task.orEmpty()
-                adapter.taskList = task
-                adapter.notifyDataSetChanged()
-            })
+            adapter.taskList = savedList
+            adapter.notifyDataSetChanged()
         }
+
         fab?.setOnClickListener { view ->
             val intent = Intent(context, TaskActivity::class.java)
             startActivityForResult(intent, ADD_TASK_REQUEST_CODE)
@@ -88,7 +86,7 @@ class TaskListFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList("taskList", viewModel.taskList as ArrayList<Task>)
+        outState.putParcelableArrayList("taskList", viewModel.taskList.value as? ArrayList<Task>)
     }
 
     companion object {

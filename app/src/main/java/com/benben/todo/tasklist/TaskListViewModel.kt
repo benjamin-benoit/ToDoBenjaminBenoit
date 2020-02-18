@@ -28,9 +28,9 @@ class TaskListViewModel : ViewModel() {
 
     fun deleteTask(task: Task) {
         viewModelScope.launch {
-            val editedTask = taskRepository.deleteTask(task) ?: return@launch
+            if (!taskRepository.deleteTask(task)) return@launch
             _taskList.value = getMutableList().apply {
-                remove(editedTask as Task)
+                remove(task)
             }
         }
     }

@@ -9,7 +9,6 @@ import kotlinx.android.synthetic.main.item_task.view.*
 class TaskListAdapter(public var taskList: List<Task> = emptyList()) :
     RecyclerView.Adapter<TaskListAdapter.TaskViewHolder>() {
 
-
     // Déclaration d'une lambda comme variable:
     var onEditClickListener: ((Task) -> Unit)? = null
     var onDeleteClickListener: ((Task) -> Unit)? = null
