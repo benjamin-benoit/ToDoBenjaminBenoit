@@ -31,7 +31,4 @@ object Api {
         .client(okHttpClient)
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
-
-
-
 }

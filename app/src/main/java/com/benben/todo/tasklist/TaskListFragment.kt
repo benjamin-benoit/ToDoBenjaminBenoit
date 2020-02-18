@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.benben.todo.R
 import com.benben.todo.task.TaskActivity
 import com.benben.todo.tasklist.TaskListViewModel
+import com.benben.todo.userinfo.UserInfoActivity
+import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.fragment_task_list.*
 import java.io.Serializable
@@ -39,6 +41,7 @@ class TaskListFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(activity)
         val fab = view.findViewById<FloatingActionButton>(R.id.fabAdd)
+//        val image_viewiew = view.findViewById<ImageView>(R.id.image_view)
 
         val textViewUser = view.findViewById<TextView>(R.id.textViewUser)
 
@@ -50,6 +53,11 @@ class TaskListFragment : Fragment() {
         savedInstanceState?.getParcelableArrayList<Task>("taskList")?.let { savedList ->
             adapter.taskList = savedList
             adapter.notifyDataSetChanged()
+        }
+
+        imageView.setOnClickListener{ view ->
+            val intent = Intent(context, UserInfoActivity::class.java)
+            startActivityForResult(intent, EDIT_IMAGE_REQUEST_CODE)
         }
 
         fab?.setOnClickListener { view ->
@@ -81,6 +89,7 @@ class TaskListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        Glide.with(this).load("https://goo.gl/gEgYUd").into(imageView)
         viewModel.loadTasks()
     }
 
@@ -92,6 +101,7 @@ class TaskListFragment : Fragment() {
     companion object {
         const val ADD_TASK_REQUEST_CODE = 777
         const val EDIT_TASK_REQUEST_CODE = 888
+        const val EDIT_IMAGE_REQUEST_CODE = 999
     }
 }
 
