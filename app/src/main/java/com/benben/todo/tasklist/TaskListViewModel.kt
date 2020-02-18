@@ -28,9 +28,9 @@ class TaskListViewModel : ViewModel() {
 
     fun deleteTask(task: Task) {
         viewModelScope.launch {
-            val editedTask = taskRepository.updateTask(task) ?: return@launch
+            val editedTask = taskRepository.deleteTask(task) ?: return@launch
             _taskList.value = getMutableList().apply {
-                remove(editedTask)
+                remove(editedTask as Task)
             }
         }
     }
@@ -38,7 +38,7 @@ class TaskListViewModel : ViewModel() {
     fun addTask(task: Task) {
 
         viewModelScope.launch {
-            val editedTask = taskRepository.updateTask(task) ?: return@launch
+            val editedTask = taskRepository.createTask(task) ?: return@launch
             _taskList.value = getMutableList().apply {
                 add(editedTask)
             }
