@@ -1,4 +1,3 @@
-
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -63,12 +62,15 @@ class TaskListFragment : Fragment() {
             adapter.notifyDataSetChanged()
         }
 
-        imageView.setOnClickListener{ view ->
+        imageView.setOnClickListener {
             val intent = Intent(context, UserInfoActivity::class.java)
             startActivityForResult(intent, EDIT_IMAGE_REQUEST_CODE)
         }
-
-        fab?.setOnClickListener { view ->
+        layoutUser.setOnClickListener {
+            val intent = Intent(context, UserInfoActivity::class.java)
+            startActivityForResult(intent, EDIT_USER_REQUEST_CODE)
+        }
+        fab?.setOnClickListener {
             val intent = Intent(context, TaskActivity::class.java)
             startActivityForResult(intent, ADD_TASK_REQUEST_CODE)
         }
@@ -113,6 +115,7 @@ class TaskListFragment : Fragment() {
     companion object {
         const val ADD_TASK_REQUEST_CODE = 777
         const val EDIT_TASK_REQUEST_CODE = 888
+        const val EDIT_USER_REQUEST_CODE = 666
         const val EDIT_IMAGE_REQUEST_CODE = 999
     }
 }

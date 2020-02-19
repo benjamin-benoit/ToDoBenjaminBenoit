@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">ToDoIbrahimaBenjamin</string>
     <string name="textview">TextView</string>
-    <string name="todo">TODO</string>
+    <string name="lastname">Firstname</string>
+    <string name="firstname">Lastname</string>
+    <string name="email">Email</string>
 </resources>
