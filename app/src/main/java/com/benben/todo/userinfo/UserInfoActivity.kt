@@ -61,6 +61,10 @@ class UserInfoActivity: AppCompatActivity() {
             // Pour récupérer le bitmap dans onActivityResult
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data?.data)
             Glide.with(this).load(bitmap).into(image_view)
+            val imageBody = imageToBody(bitmap)
+            lifecycleScope.launch {
+                updateAvatar(imageBody)
+            }
         }
     }
 
