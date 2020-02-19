@@ -5,68 +5,52 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/pictureLayout"
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="match_parent"
+        android:layout_height="200dp" />
+
+    <Button
+        android:id="@+id/upload_image_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:text="Choisir une Image" />
 
-        <ImageView
-            android:id="@+id/image_view"
-            android:layout_width="match_parent"
-            android:layout_height="200dp" />
-
-        <Button
-            android:id="@+id/upload_image_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Choisir une Image" />
-
-        <Button
-            android:id="@+id/take_picture_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Prendre une photo" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/userEdit"
+    <Button
+        android:id="@+id/take_picture_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="visible"
-        tools:visibility="visible">
+        android:text="Prendre une photo" />
 
-        <EditText
-            android:id="@+id/userFirstName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/firstname"
-            android:importantForAutofill="no"
-            android:inputType="textPersonName" />
+    <EditText
+        android:id="@+id/userFirstName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/firstname"
+        android:importantForAutofill="no"
+        android:inputType="textPersonName" />
 
-        <EditText
-            android:id="@+id/userLastName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/lastname"
-            android:inputType="textPersonName" />
+    <EditText
+        android:id="@+id/userLastName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/lastname"
+        android:inputType="textPersonName" />
 
-        <EditText
-            android:id="@+id/userEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/email"
-            android:inputType="textPersonName" />
+    <EditText
+        android:id="@+id/userEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/email"
+        android:inputType="textPersonName" />
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@android:string/ok" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@android:string/ok" />
 
 </LinearLayout>

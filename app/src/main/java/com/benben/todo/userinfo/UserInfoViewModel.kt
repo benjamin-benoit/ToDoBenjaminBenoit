@@ -11,23 +11,10 @@ class UserInfoViewModel : ViewModel() {
     private val _userInfo = MutableLiveData<UserInfo>()
     public val userInfo: LiveData<UserInfo> = _userInfo
 
-    private fun getMutableList() = _userInfo.value
-
-    suspend fun getUser() {
+    fun editUser(userInfo: UserInfo) {
         viewModelScope.launch {
-            val editedUser = userInfoRepository.getUserInfo()
-            _userInfo.value = getMutableList().apply {
-                onCleared()
-                editedUser?.let { it }
-            }
-        }
-    }
-
-    suspend fun editUser(userInfo: UserInfo) {
-        viewModelScope.launch {
-            val editedUser = userInfoRepository.updateTask(userInfo) ?: return@launch
-            _userInfo.value = getMutableList().apply {
-            }
+            val editedUser = userInfoRepository.updateUser(userInfo) ?: return@launch
+            _userInfo.value = editedUser
         }
     }
 }

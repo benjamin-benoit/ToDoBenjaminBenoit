@@ -14,7 +14,9 @@ import com.benben.todo.R
 import com.benben.todo.network.Api
 import com.benben.todo.task.TaskActivity
 import com.benben.todo.tasklist.TaskListViewModel
+import com.benben.todo.userinfo.UserInfo
 import com.benben.todo.userinfo.UserInfoActivity
+import com.benben.todo.userinfo.UserInfoViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.fragment_task_list.*
@@ -26,8 +28,11 @@ import java.util.*
 class TaskListFragment : Fragment() {
 
     var adapter = TaskListAdapter()
-    private val viewModel by lazy {
+    private val viewModelTask by lazy {
         ViewModelProvider(this).get(TaskListViewModel::class.java)
+    }
+    private val viewModelUserInfo by lazy {
+        ViewModelProvider(this).get(UserInfoViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -52,7 +57,7 @@ class TaskListFragment : Fragment() {
             email.text = "${userInfo.email}"
         }
 
-        viewModel.taskList.observe(this, Observer { newList ->
+        viewModelTask.taskList.observe(this, Observer { newList ->
             adapter.taskList = newList.orEmpty()
             adapter.notifyDataSetChanged()
         })
@@ -81,7 +86,7 @@ class TaskListFragment : Fragment() {
             recyclerView.adapter?.notifyDataSetChanged()
         }
         adapter.onDeleteClickListener = { task ->
-            viewModel.deleteTask(task)
+            viewModelTask.deleteTask(task)
         }
     }
 
@@ -89,11 +94,16 @@ class TaskListFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == ADD_TASK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val task = data!!.getSerializableExtra("task") as Task
-            viewModel.addTask(task)
+            viewModelTask.addTask(task)
             recyclerView.adapter?.notifyDataSetChanged()
         } else if (requestCode == EDIT_TASK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val task = data!!.getSerializableExtra("task") as Task
-            viewModel.editTask(task)
+            viewModelTask.editTask(task)
+        } else if (requestCode == EDIT_USER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val userInfo = data!!.getSerializableExtra("userInfo") as UserInfo
+            viewModelUserInfo.editUser(userInfo)
+            textViewUser.text = "${userInfo.firstName} ${userInfo.lastName}"
+            email.text = "${userInfo.email}"
         }
     }
 
@@ -102,14 +112,14 @@ class TaskListFragment : Fragment() {
         val glide = Glide.with(this)
         lifecycleScope.launch {
             val userInfo = Api.userService.getInfo().body()!!
-            glide.load(userInfo.avatar).into(imageView)
+            glide.load(userInfo.avatar).circleCrop().into(imageView)
         }
-        viewModel.loadTasks()
+        viewModelTask.loadTasks()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList("taskList", viewModel.taskList.value as? ArrayList<Task>)
+        outState.putParcelableArrayList("taskList", viewModelTask.taskList.value as? ArrayList<Task>)
     }
 
     companion object {

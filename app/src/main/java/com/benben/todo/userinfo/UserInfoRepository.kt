@@ -15,11 +15,10 @@ class UserInfoRepository {
         return null
     }
 
-    suspend fun updateTask(user: UserInfo): UserInfo? {
+    suspend fun updateUser(user: UserInfo): UserInfo? {
         val userResponse = userService.update(user)
         return if (userResponse.isSuccessful) {
             userResponse.body()
         } else null
     }
-
 }
