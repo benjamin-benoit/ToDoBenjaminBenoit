@@ -48,7 +48,9 @@ class TaskListViewModel : ViewModel() {
         viewModelScope.launch {
             val editedTask = taskRepository.updateTask(task) ?: return@launch
             _taskList.value = getMutableList().apply {
+
                 val position = indexOfFirst { editedTask.id == it.id }
+
                 set(position, editedTask)
             }
         }
