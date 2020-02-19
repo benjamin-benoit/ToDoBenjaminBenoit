@@ -22,7 +22,7 @@
         android:id="@+id/task_description"
         android:layout_width="0dp"
         android:layout_height="20dp"
-        android:background="@android:color/holo_blue_bright"
+        android:background="#20F790"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/deleteButton"
         app:layout_constraintHorizontal_bias="0.0"
@@ -38,7 +38,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/editButton"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_delete" />
+        app:srcCompat="@android:drawable/ic_menu_delete"
+        android:contentDescription="TODO" />
 
     <ImageButton
         android:id="@+id/editButton"
