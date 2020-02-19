@@ -44,12 +44,13 @@ class TaskListFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(activity)
         val fab = view.findViewById<FloatingActionButton>(R.id.fabAdd)
-//        val image_viewiew = view.findViewById<ImageView>(R.id.image_view)
+        // val image_viewiew = view.findViewById<ImageView>(R.id.image_view)
 
         val textViewUser = view.findViewById<TextView>(R.id.textViewUser)
         lifecycleScope.launch {
             val userInfo = Api.userService.getInfo().body()!!
             textViewUser.text = "${userInfo.firstName} ${userInfo.lastName}"
+            email.text = "${userInfo.email}"
         }
 
         viewModel.taskList.observe(this, Observer { newList ->

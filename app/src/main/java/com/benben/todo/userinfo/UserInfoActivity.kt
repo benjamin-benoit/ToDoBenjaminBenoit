@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.benben.todo.R
 import com.benben.todo.network.Api
-import com.benben.todo.network.UserInfo
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_user_info.*
 import kotlinx.coroutines.launch
@@ -70,7 +69,7 @@ class UserInfoActivity: AppCompatActivity() {
     private fun showDialogBeforeRequest() {
         // Affiche une popup (Dialog) d'explications:
         AlertDialog.Builder(this).apply {
-            setMessage("On a besoin de la caméra sivouplé ! 🥺")
+            setMessage("On a besoin de la caméra sioupley ! 🥺")
             setPositiveButton(android.R.string.ok) { _, _ -> requestCameraPermission() }
             setCancelable(true)
             show()
@@ -157,7 +156,7 @@ class UserInfoActivity: AppCompatActivity() {
         } else if (requestCode == GALLERY_REQUEST_CODE && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
             uploadImage()
         } else {
-            Toast.makeText(this, "Si vous refusez, on peux pas prendre de photo ! 😢", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Si vous refusez, on peux pas prendre de photo et on va vous goumer ! 😢", Toast.LENGTH_LONG).show()
         }
     }
 }

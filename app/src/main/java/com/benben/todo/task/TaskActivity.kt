@@ -29,8 +29,8 @@ class TaskActivity : AppCompatActivity() {
             id = task.id
         }
 
-        fab?.setOnClickListener { view ->
-            var myTask = Task(id = id, title = title.text.toString(), description = description.text.toString())
+        fab?.setOnClickListener {
+            val myTask = Task(id = id, title = title.text.toString(), description = description.text.toString())
             intent.putExtra("task", myTask as Serializable)
             setResult(Activity.RESULT_OK, intent)
             finish()

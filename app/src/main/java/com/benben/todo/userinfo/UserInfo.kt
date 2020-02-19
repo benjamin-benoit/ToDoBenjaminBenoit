@@ -1,4 +1,4 @@
-package com.benben.todo.network
+package com.benben.todo.userinfo
 
 import com.squareup.moshi.Json
 

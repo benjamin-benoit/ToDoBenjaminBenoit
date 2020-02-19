@@ -26,10 +26,10 @@ class TaskListAdapter : RecyclerView.Adapter<TaskListAdapter.TaskViewHolder>() {
             val deleteButton = itemView.findViewById<ImageButton>(R.id.deleteButton)
             val editButton = itemView.findViewById<ImageButton>(R.id.editButton)
 
-            editButton?.setOnClickListener { itemView ->
+            editButton?.setOnClickListener {
                 onEditClickListener?.invoke(task)
             }
-            deleteButton?.setOnClickListener { itemView ->
+            deleteButton?.setOnClickListener {
                 onDeleteClickListener?.invoke(task)
             }
         }
