@@ -14,6 +14,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        def addConstant = { constantName, constantValue ->
+            manifestPlaceholders += [ (constantName):constantValue] // Pour utiliser dans le manifest
+            buildConfigField "String", "${constantName}", "\"${constantValue}\"" // Pour utiliser dans le code
+        }
+        addConstant("FILE_PROVIDER_AUTHORITY", "<MY-STRING-VALUE>")
     }
     buildTypes {
         release {

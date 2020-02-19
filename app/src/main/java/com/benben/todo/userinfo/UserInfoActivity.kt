@@ -38,6 +38,7 @@ class UserInfoActivity: AppCompatActivity() {
             askCameraPermissionAndOpenCamera()
         }
         uploadImageButton.setOnClickListener{
+            uploadImage()
         }
         val glide = Glide.with(this)
         lifecycleScope.launch {
@@ -54,7 +55,13 @@ class UserInfoActivity: AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        handlePhotoTaken(data)
+        if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            handlePhotoTaken(data)
+        } else if (requestCode == GALLERY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // Pour récupérer le bitmap dans onActivityResult
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data?.data)
+            Glide.with(this).load(bitmap).into(image_view)
+        }
     }
 
     private fun askCameraPermissionAndOpenCamera() {
@@ -74,7 +81,7 @@ class UserInfoActivity: AppCompatActivity() {
     private fun showDialogBeforeRequest() {
         // Affiche une popup (Dialog) d'explications:
         AlertDialog.Builder(this).apply {
-            setMessage("On a besoin de la caméra sioupley ! 🥺")
+            setMessage("On a besoin de la caméra ! 🥺")
             setPositiveButton(android.R.string.ok) { _, _ -> requestCameraPermission() }
             setCancelable(true)
             show()
@@ -87,8 +94,10 @@ class UserInfoActivity: AppCompatActivity() {
     }
 
     private fun openCamera() {
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(cameraIntent, Companion.CAMERA_REQUEST_CODE)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
+        }
     }
 
     private fun uploadImage() {
@@ -96,9 +105,6 @@ class UserInfoActivity: AppCompatActivity() {
         val galleryIntent = Intent(Intent.ACTION_PICK)
         galleryIntent.type = "image/*"
         startActivityForResult(galleryIntent, GALLERY_REQUEST_CODE)
-
-        // Pour récupérer le bitmap dans onActivityResult
-//        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data?.data)
     }
 
     private fun handlePhotoTaken(data: Intent?) {
@@ -164,7 +170,7 @@ class UserInfoActivity: AppCompatActivity() {
         } else if (requestCode == GALLERY_REQUEST_CODE && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
             uploadImage()
         } else {
-            Toast.makeText(this, "Si vous refusez, on peux pas prendre de photo et on va vous goumer ! 😢", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Si vous refusez, on peux pas prendre de photo ! 😢", Toast.LENGTH_LONG).show()
         }
     }
 }
