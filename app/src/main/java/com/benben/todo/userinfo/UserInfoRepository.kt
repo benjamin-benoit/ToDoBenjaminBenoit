@@ -18,9 +18,7 @@ class UserInfoRepository {
     suspend fun updateUser(user: UserInfo): UserInfo? {
         val userResponse = userService.update(user)
         return if (userResponse.isSuccessful) {
-
             userResponse.body()
-
         } else null
     }
 }
