@@ -5,7 +5,9 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Button
 import android.widget.Toast
@@ -13,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.benben.todo.R
 import com.benben.todo.network.Api
@@ -23,10 +26,57 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class UserInfoActivity: AppCompatActivity() {
 
     private val userWebService = Api.userService
+
+    lateinit var currentPhotoPath: String
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            currentPhotoPath = absolutePath
+        }
+    }
+
+    val REQUEST_TAKE_PHOTO = 1
+
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            // Ensure that there's a camera activity to handle the intent
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                // Create the File where the photo should go
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    // Error occurred while creating the File
+                    null
+                }
+                // Continue only if the File was successfully created
+                photoFile?.also {
+                    val photoURI: Uri = FileProvider.getUriForFile(
+                        this,
+                        "com.example.android.fileprovider",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO)
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,13 +103,36 @@ class UserInfoActivity: AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            handlePhotoTaken(data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
+
+            val extra = intent!!.getSerializableExtra(MediaStore.EXTRA_OUTPUT)
+
+            val test = intent?.data
+            val image = intent?.extras?.get("data") as? Uri
+//            Glide.with(this).load(image).into(image_view)
+
+//            val imageBody = imageToBody(image)
+//            lifecycleScope.launch {
+//                updateAvatar(imageBody)
+//            }
+
+            val f = File(cacheDir, "tmpfile.jpg")
+            val body = RequestBody.create(MediaType.parse(currentPhotoPath), f)
+            val imageBody = MultipartBody.Part.createFormData("avatar", image.toString(), body)
+            lifecycleScope.launch {
+                updateAvatar(imageBody)
+            }
+        }
+        else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            handlePhotoTaken(intent)
+//        }
+//        else if (requestCode == CAMERA_PERMISSION_CODE && resultCode == Activity.RESULT_OK) {
+//            handlePhotoTaken(data)
         } else if (requestCode == GALLERY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             // Pour récupérer le bitmap dans onActivityResult
-            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data?.data)
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, intent?.data)
             Glide.with(this).load(bitmap).into(image_view)
             val imageBody = imageToBody(bitmap)
             lifecycleScope.launch {
@@ -99,8 +172,9 @@ class UserInfoActivity: AppCompatActivity() {
 
     private fun openCamera() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
+//            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
+            dispatchTakePictureIntent()
         }
     }
 
