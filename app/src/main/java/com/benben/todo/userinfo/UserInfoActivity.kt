@@ -131,6 +131,7 @@ class UserInfoActivity : AppCompatActivity() {
                 MediaType.parse(currentPhotoPath),
                 file
             )
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, intent?.data)
             val imageBody = MultipartBody.Part.createFormData("avatar", image.toString(), body)
             lifecycleScope.launch {
                 updateAvatar(imageBody)
