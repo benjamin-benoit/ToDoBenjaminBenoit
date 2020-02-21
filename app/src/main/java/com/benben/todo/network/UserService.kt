@@ -1,5 +1,7 @@
 package com.benben.todo.network
 
+import com.benben.todo.auth.LoginForm
+import com.benben.todo.auth.LoginResponse
 import com.benben.todo.userinfo.UserInfo
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -15,4 +17,7 @@ interface UserService {
 
     @PATCH("users")
     suspend fun update(@Body user: UserInfo): Response<UserInfo>
+
+    @POST("users/login")
+    suspend fun login(@Body user: LoginForm): Response<LoginResponse>
 }
