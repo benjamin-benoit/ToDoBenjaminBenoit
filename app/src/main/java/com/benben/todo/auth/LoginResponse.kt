@@ -8,7 +8,7 @@ import java.io.Serializable
 @Parcelize
 data class LoginResponse(
     @field:Json(name = "email")
-    val id: String,
+    val email: String,
     @field:Json(name = "password")
-    val title: String
+    val password: String
 ): Serializable, Parcelable

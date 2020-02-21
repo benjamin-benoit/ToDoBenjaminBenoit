@@ -2,6 +2,8 @@ package com.benben.todo.userinfo
 
 
 import Task
+import com.benben.todo.auth.LoginForm
+import com.benben.todo.auth.LoginResponse
 import com.benben.todo.network.Api
 
 class UserInfoRepository {
@@ -17,6 +19,18 @@ class UserInfoRepository {
 
     suspend fun updateUser(user: UserInfo): UserInfo? {
         val userResponse = userService.update(user)
+        return if (userResponse.isSuccessful) {
+            userResponse.body()
+        } else null
+    }
+    suspend fun login(user: LoginForm): LoginResponse? {
+        val userResponse = userService.login(user)
+        return if (userResponse.isSuccessful) {
+            userResponse.body()
+        } else null
+    }
+    suspend fun signUp(user: LoginForm): LoginResponse? {
+        val userResponse = userService.login(user)
         return if (userResponse.isSuccessful) {
             userResponse.body()
         } else null

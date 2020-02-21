@@ -18,14 +18,8 @@ class AuthenticationFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_authentication, container, false)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val buttonLogin = buttonLogin
-        val buttonSignIn = buttonSignUp
         buttonLogin.setOnClickListener{
             findNavController().navigate(R.id.action_authenticationFragment_to_loginFragment)
         }

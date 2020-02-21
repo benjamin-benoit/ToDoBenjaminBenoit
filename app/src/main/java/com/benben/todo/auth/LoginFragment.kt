@@ -1,6 +1,7 @@
 package com.benben.todo.auth
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +41,7 @@ class LoginFragment : Fragment() {
 //            PreferenceManager.getDefaultSharedPreferences(context).edit {
 //                putString(SHARED_PREF_TOKEN_KEY, fetchedToken)
 //            }
+            Log.e("body", userResponse.body().toString())
             userResponse.body()
         } else {
             Toast.makeText(context, "text", Toast.LENGTH_LONG).show()
