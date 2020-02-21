@@ -5,15 +5,18 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +24,7 @@ import com.benben.todo.R
 import com.benben.todo.network.Api
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_user_info.*
+import kotlinx.android.synthetic.main.fragment_task_list.*
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -29,10 +33,9 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class UserInfoActivity: AppCompatActivity() {
+class UserInfoActivity : AppCompatActivity() {
 
     private val userWebService = Api.userService
-
     lateinit var currentPhotoPath: String
 
     @Throws(IOException::class)
@@ -62,9 +65,13 @@ class UserInfoActivity: AppCompatActivity() {
                     createImageFile()
                 } catch (ex: IOException) {
                     // Error occurred while creating the File
+                    Toast.makeText(
+                        baseContext,
+                        "Capture Image Bug: " + ex.message.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
                     null
                 }
-                // Continue only if the File was successfully created
                 photoFile?.also {
                     val photoURI: Uri = FileProvider.getUriForFile(
                         this,
@@ -81,13 +88,13 @@ class UserInfoActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_info)
-        val takePictureButton = findViewById<Button>(R.id.take_picture_button)
+        val takePictureButton = take_picture_button
         val uploadImageButton = findViewById<Button>(R.id.upload_image_button)
 
-        takePictureButton.setOnClickListener{
+        takePictureButton.setOnClickListener {
             askCameraPermissionAndOpenCamera()
         }
-        uploadImageButton.setOnClickListener{
+        uploadImageButton.setOnClickListener {
             uploadImage()
         }
         val glide = Glide.with(this)
@@ -95,8 +102,12 @@ class UserInfoActivity: AppCompatActivity() {
             val userInfo = getInfo()
             glide.load(userInfo?.avatar).into(image_view)
         }
-        button.setOnClickListener{
-            val myUser = UserInfo(email = userEmail.text.toString(), firstName = userFirstName.text.toString(), lastName = userLastName.text.toString())
+        button.setOnClickListener {
+            val myUser = UserInfo(
+                email = userEmail.text.toString(),
+                firstName = userFirstName.text.toString(),
+                lastName = userLastName.text.toString()
+            )
             intent.putExtra("userInfo", myUser as Serializable)
             setResult(Activity.RESULT_OK, intent)
             finish()
@@ -118,14 +129,17 @@ class UserInfoActivity: AppCompatActivity() {
 //                updateAvatar(imageBody)
 //            }
 
-            val f = File(cacheDir, "tmpfile.jpg")
-            val body = RequestBody.create(MediaType.parse(currentPhotoPath), f)
+            val file = File(cacheDir, "tmpfile.jpg")
+            Log.e("add", file.exists().toString())
+            val body = RequestBody.create(
+                MediaType.parse(currentPhotoPath),
+                file
+            )
             val imageBody = MultipartBody.Part.createFormData("avatar", image.toString(), body)
             lifecycleScope.launch {
                 updateAvatar(imageBody)
             }
-        }
-        else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             handlePhotoTaken(intent)
 //        }
 //        else if (requestCode == CAMERA_PERMISSION_CODE && resultCode == Activity.RESULT_OK) {
@@ -142,8 +156,16 @@ class UserInfoActivity: AppCompatActivity() {
     }
 
     private fun askCameraPermissionAndOpenCamera() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.CAMERA
+                )
+            ) {
                 // l'OS dit d'expliquer pourquoi on a besoin de cette permission:
                 showDialogBeforeRequest()
             } else {
@@ -167,11 +189,19 @@ class UserInfoActivity: AppCompatActivity() {
 
     private fun requestCameraPermission() {
         // CAMERA_PERMISSION_CODE est défini par nous et sera récupéré dans onRequestPermissionsResult
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE )
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.CAMERA),
+            CAMERA_PERMISSION_CODE
+        )
     }
 
     private fun openCamera() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
 //            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 //            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
             dispatchTakePictureIntent()
@@ -215,10 +245,10 @@ class UserInfoActivity: AppCompatActivity() {
     // Celle ci n'est pas très intéressante à lire
     // En gros, elle lit le fichier et le prépare pour l'envoi HTTP
     private fun imageToBody(image: Bitmap?): MultipartBody.Part {
-        val f = File(cacheDir, "tmpfile.jpg")
-        f.createNewFile()
+        val file = File(cacheDir, "tmpfile.jpg")
+        file.createNewFile()
         try {
-            val fos = FileOutputStream(f)
+            val fos = FileOutputStream(file)
             image?.compress(Bitmap.CompressFormat.PNG, 100, fos)
             fos.flush()
             fos.close()
@@ -227,8 +257,8 @@ class UserInfoActivity: AppCompatActivity() {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        val body = RequestBody.create(MediaType.parse("image/png"), f)
-        return MultipartBody.Part.createFormData("avatar", f.path, body)
+        val body = RequestBody.create(MediaType.parse("image/png"), file)
+        return MultipartBody.Part.createFormData("avatar", file.path, body)
     }
 
     companion object {
@@ -248,7 +278,12 @@ class UserInfoActivity: AppCompatActivity() {
         } else if (requestCode == GALLERY_REQUEST_CODE && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
             uploadImage()
         } else {
-            Toast.makeText(this, "Si vous refusez, on peux pas prendre de photo ! 😢", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                "Si vous refusez, on peux pas prendre de photo ! 😢",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
+
 }
