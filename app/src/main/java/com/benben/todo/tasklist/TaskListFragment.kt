@@ -48,7 +48,7 @@ class TaskListFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(activity)
         val fab = view.findViewById<FloatingActionButton>(R.id.fabAdd)
-        // val image_viewiew = view.findViewById<ImageView>(R.id.image_view)
+        // val photo_pic = view.findViewById<ImageView>(R.id.photo_pic)
 
         val textViewUser = view.findViewById<TextView>(R.id.textViewUser)
         lifecycleScope.launch {
@@ -67,7 +67,7 @@ class TaskListFragment : Fragment() {
             adapter.notifyDataSetChanged()
         }
 
-        imageView.setOnClickListener {
+        imageLogo.setOnClickListener {
             val intent = Intent(context, UserInfoActivity::class.java)
             startActivityForResult(intent, EDIT_IMAGE_REQUEST_CODE)
         }
@@ -112,7 +112,7 @@ class TaskListFragment : Fragment() {
         val glide = Glide.with(this)
         lifecycleScope.launch {
             val userInfo = Api.userService.getInfo().body()!!
-            glide.load(userInfo.avatar).circleCrop().into(imageView)
+            glide.load(userInfo.avatar).circleCrop().into(imageLogo)
         }
         viewModelTask.loadTasks()
     }

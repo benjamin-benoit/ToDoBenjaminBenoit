@@ -100,7 +100,7 @@ class UserInfoActivity : AppCompatActivity() {
         val glide = Glide.with(this)
         lifecycleScope.launch {
             val userInfo = getInfo()
-            glide.load(userInfo?.avatar).into(image_view)
+            glide.load(userInfo?.avatar).into(photo_pic)
         }
         button.setOnClickListener {
             val myUser = UserInfo(
@@ -118,11 +118,8 @@ class UserInfoActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, intent)
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
 
-            val extra = intent!!.getSerializableExtra(MediaStore.EXTRA_OUTPUT)
-
-            val test = intent?.data
             val image = intent?.extras?.get("data") as? Uri
-//            Glide.with(this).load(image).into(image_view)
+//            Glide.with(this).load(image).into(photo_pic)
 
 //            val imageBody = imageToBody(image)
 //            lifecycleScope.launch {
@@ -130,7 +127,6 @@ class UserInfoActivity : AppCompatActivity() {
 //            }
 
             val file = File(cacheDir, "tmpfile.jpg")
-            Log.e("add", file.exists().toString())
             val body = RequestBody.create(
                 MediaType.parse(currentPhotoPath),
                 file
@@ -147,7 +143,7 @@ class UserInfoActivity : AppCompatActivity() {
         } else if (requestCode == GALLERY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             // Pour récupérer le bitmap dans onActivityResult
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, intent?.data)
-            Glide.with(this).load(bitmap).into(image_view)
+            Glide.with(this).load(bitmap).into(photo_pic)
             val imageBody = imageToBody(bitmap)
             lifecycleScope.launch {
                 updateAvatar(imageBody)
@@ -217,7 +213,7 @@ class UserInfoActivity : AppCompatActivity() {
 
     private fun handlePhotoTaken(data: Intent?) {
         val image = data?.extras?.get("data") as? Bitmap
-        Glide.with(this).load(image).into(image_view)
+        Glide.with(this).load(image).into(photo_pic)
 
         val imageBody = imageToBody(image)
         lifecycleScope.launch {
