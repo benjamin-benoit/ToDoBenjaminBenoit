@@ -37,6 +37,9 @@ class LoginFragment : Fragment() {
     suspend fun login(user: LoginForm): LoginResponse? {
         val userResponse = Api.userService.login(user)
         return if (userResponse.isSuccessful) {
+//            PreferenceManager.getDefaultSharedPreferences(context).edit {
+//                putString(SHARED_PREF_TOKEN_KEY, fetchedToken)
+//            }
             userResponse.body()
         } else {
             Toast.makeText(context, "text", Toast.LENGTH_LONG).show()
